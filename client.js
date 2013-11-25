@@ -1,8 +1,8 @@
 var http = require('http');
 http.globalAgent.maxSockets = Infinity;
 
-var total = 10000;
-var maxCurrence = 157;
+var total = 1000;
+var maxCurrence = 100;
 
 var currentRequestCount = 0;
 var errorCount = 0;
@@ -33,9 +33,9 @@ var step = total / 10;
 
             responseCount += 1;
 
-            if (responseCount >= total) {
+            if (responseCount === total) {
                 done();
-            } else if (currentRequestCount < maxCurrence) {
+            } else if (currentRequestCount < maxCurrence && requestCount < total) {
                 sendRequest();
             }
         });
@@ -47,23 +47,23 @@ var step = total / 10;
     currentRequestCount += 1;
     requestCount += 1;
 
-    if (currentRequestCount < maxCurrence && responseCount < total) {
+    if (currentRequestCount < maxCurrence && requestCount < total) {
         sendRequest();
     }
 }());
 
 var now = +new Date();
 function done() {
-    var average = (+new Date() - now) / total;
+    var rps = Math.round(total / (+new Date() - now) * 100000) / 100;
     durations = durations.sort();
 
     var dot99 = durations[Math.floor(durations.length * 0.99)];
     var dot50 = durations[Math.floor(durations.length * 0.5)];
 
     console.log('all done');
-    console.log('Average RTT: ', average, 'ms');
-    console.log('.99 : ', dot99, 'ms');
+    console.log('rps: ', rps, 'requests/second');
     console.log('.50 : ', dot50, 'ms');
+    console.log('.99 : ', dot99, 'ms');
 
     if (errorCount) {
         console.log('%d error response', errorCount);
