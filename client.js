@@ -33,7 +33,7 @@ var step = total / 10;
 
             responseCount += 1;
 
-            if (responseCount === total) {
+            if (responseCount >= total) {
                 done();
             } else if (currentRequestCount < maxCurrence) {
                 sendRequest();
